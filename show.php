@@ -16,7 +16,7 @@ $moviesResult = $conn->query($moviesQuery);
 <br>
 
 <div class="container">
-  <h2>Recommended </h2>
+  <h2>Recommended Movies</h2>
   <br>
 
   <div class="card movies-grid">
