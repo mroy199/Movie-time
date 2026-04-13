@@ -1,0 +1,1175 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: black;
+}
+
+.nav_bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: black;
+    padding: 10px 40px;
+    height: auto; /* Changed from 70px so it can expand if needed */
+    flex-wrap: wrap; /* Allows items to wrap on small screens */
+}
+/*
+.nav_bar .right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0;
+}
+.logo img{
+    height: 60px;
+    width: auto;
+    cursor: pointer;
+}
+
+
+.nav_bar .left{
+   display: flex;   
+    align-items: center;
+    gap: 20px;
+
+}
+
+.left img {
+    width: 120px;
+    height: auto;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: #1c1f23;
+    border: 1px solid #3a3f44;
+    border-radius: 8px;
+    padding: 10px 15px;
+    width: 180px;
+}
+
+.search-box i {
+    color: #9aa0a6;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    width: 100%;
+    font-size: 15px;
+}
+
+.search-box input::placeholder {
+    color: #9aa0a6;
+}
+
+.right button {
+    width: 80px;
+    height: 30px;
+    border: none;
+    border-radius: 4px;
+    background-color: rgb(244, 69, 98);
+    color: white;
+    cursor: pointer;
+}
+
+.right i {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.loc {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
+
+.loc select {
+    background: white;
+    color: rgb(9, 7, 7);
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.menu {
+    margin-left: 5px;
+}
+*/
+.sec-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 40px;
+    background-color: rgb(221, 221, 221);
+    color: rgb(4, 3, 3);
+}
+
+.sec-nav .s-left,
+.sec-nav .s-right {
+    display: flex;
+}
+
+.s-left p,
+.s-right p {
+    margin: 0 15px;
+}
+
+.sec-nav p:hover {
+    color: rgb(245, 70, 99);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.banner-img,
+.main img {
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    height: 550px;
+}
+
+
+.container h2 {
+    margin: 20px 30px;
+    color: white;
+}
+
+.container .card {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 0 30px;
+}
+
+.card img {
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.card img:hover {
+    transform: scale(1.05);
+
+}
+
+.premiere {
+    background-color: rgb(8, 8, 19);
+    color: white;
+    padding: 40px;
+    margin-top: 40px;
+}
+
+
+/* ===============================
+   PREMIUM PROFESSIONAL FOOTER
+================================ */
+
+.footer {
+    background: #0f0f0f;
+    color: #ccc;
+    font-family: Arial, sans-serif;
+}
+
+/* SERVICE STRIP */
+.footer-services {
+    display: flex;
+    justify-content: space-around;
+    background: #1a1a1a;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.service i {
+    font-size: 28px;
+    color: #f84464;
+    margin-bottom: 10px;
+}
+
+.service h5 {
+    color: white;
+    margin-bottom: 5px;
+}
+
+.service p {
+    font-size: 13px;
+    color: #aaa;
+}
+
+/* MAIN SECTION */
+.footer-main {
+    display: flex;
+    justify-content: space-between;
+    padding: 60px 40px;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.footer-col {
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-logo {
+    width: 140px;
+    margin-bottom: 15px;
+}
+
+.footer-about {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #999;
+}
+
+.footer-col h4 {
+    color: white;
+    margin-bottom: 15px;
+}
+
+.footer-col a {
+    text-decoration: none;
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 8px;
+    transition: 0.3s;
+}
+
+.footer-col a:hover {
+    color: #f84464;
+}
+
+/* NEWSLETTER */
+.newsletter input {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.newsletter button {
+    padding: 10px;
+    border: none;
+    background: #f84464;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.newsletter button:hover {
+    background: #d63350;
+}
+
+/* BOTTOM */
+.footer-bottom {
+    border-top: 1px solid #222;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.footer-social i {
+    margin: 0 10px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.footer-social i:hover {
+    color: #f84464;
+    transform: scale(1.2);
+}
+
+.footer-bottom p {
+    margin-top: 15px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+
+    .footer-services {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .footer-main {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+}
+
+.movie img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.movie p {
+    font-size: 14px;
+    margin-top: 8px;
+    color: #ccc;
+}
+
+.movie {
+    width: 180px;
+    color: white;
+}
+
+.movie img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.movie p {
+    font-size: 14px;
+    margin-top: 8px;
+    color: #ccc;
+    cursor: pointer;
+
+
+}
+
+.movie h3 {
+    margin-top: 5px;
+    font-size: 18px;
+    cursor: pointer;
+
+
+}
+
+.search-box {
+    position: relative;
+    width: 350px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 10px 10px 35px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.search-box i {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    color: gray;
+}
+
+.search-results {
+    position: absolute;
+    background: white;
+    width: 350px;
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 1000;
+}
+
+.search-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.search-item img {
+    width: 50px;
+    border-radius: 5px;
+}
+
+.search-item:hover {
+    background: #f2f2f2;
+}
+
+.search-item strong span {
+    color: red;
+}
+
+
+
+/* Overlay background */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    z-index: 999;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -300px;   /* 👈 Start hidden on RIGHT */
+    width: 280px;
+    height: 100vh;
+    background: white;
+    transition: 0.3s ease;
+    z-index: 9999;
+}
+
+.sidebar.active {
+    right: 0;   /* 👈 Slide in from RIGHT */
+}
+
+.overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    z-index: 9998;
+}
+
+
+.login button {
+    background-color: #f84464;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login button:hover {
+    background-color: #d63350;
+    transform: translateY(-2px);
+}
+
+.login-box {
+    width: 90%;
+    max-width: 350px;
+}
+
+.register-box {
+    width: 90%;
+    max-width: 350px;
+}
+/* ========================= */
+/* MOBILE RESPONSIVE DESIGN  */
+/* ========================= */
+
+@media (max-width: 768px) {
+
+    .nav_bar {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .sec-nav {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .container .card {
+        justify-content: center;
+    }
+
+    .movie {
+        width: 45%;
+    }
+
+    .banner-img,
+    .main img {
+        height: auto;
+    }
+
+    .footer {
+        padding: 30px 15px;
+    }
+
+}
+
+.seats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px;
+    justify-content: center;
+}
+
+.seats button {
+    width: 60px;
+    height: 40px;
+    border: none;
+    border-radius: 6px;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+}
+
+.seats button:hover {
+    background-color: #f84464;
+}
+
+/* ================= SEAT PAGE ================= */
+
+.seat-container {
+    text-align: center;
+    margin-top: 40px;
+    color: white;
+}
+
+.screen {
+    background: #ccc;
+    height: 8px;
+    width: 60%;
+    margin: 20px auto;
+    border-radius: 50%;
+}
+
+.seats {
+    display: grid;
+    grid-template-columns: repeat(5, 60px);
+    gap: 15px;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.seats button {
+    width: 60px;
+    height: 45px;
+    border-radius: 8px;
+    border: none;
+    background: #2c2c2c;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.seats button:hover {
+    background: #f84464;
+}
+
+.seats button.selected {
+    background: #4CAF50;
+}
+
+.seat-summary {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.primary-btn {
+    padding: 12px 25px;
+    background: #f84464;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.primary-btn:hover {
+    background: #d63350;
+}
+
+/* Seat Grid Layout */
+.seats {
+    display: grid;
+    grid-template-columns: repeat(5, 60px);
+    gap: 15px;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.seats button {
+    width: 60px;
+    height: 45px;
+    border-radius: 8px;
+    border: none;
+    background: #2c2c2c;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: bold;
+}
+
+.seats button:hover {
+    background: #f84464;
+}
+
+.seats button.selected {
+    background: #4CAF50;
+}
+
+.seats button.booked {
+    background: #777;
+    cursor: not-allowed;
+}
+
+.receipt button {
+    display: block;
+    margin: 25px auto 0 auto; 
+    padding: 12px 30px;
+    border-radius: 8px;
+    border: none;
+    background: #f84464;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Animated Checkmark */
+
+.checkmark-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #4CAF50;
+    margin: 0 auto 15px;
+    position: relative;
+    animation: pop 0.4s ease forwards;
+}
+
+.checkmark {
+    position: absolute;
+    left: 22px;
+    top: 35px;
+    width: 25px;
+    height: 12px;
+    border-left: 4px solid white;
+    border-bottom: 4px solid white;
+    transform: rotate(-45deg);
+}
+
+@keyframes pop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+}
+
+.receipt {
+    max-width: 500px;
+    margin: 80px auto;
+    background: #fff;
+    color: black;
+    padding: 30px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border-left: 8px solid #f84464;
+}
+
+.receipt::before,
+.receipt::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #111;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.receipt::before {
+    left: -10px;
+}
+
+.receipt::after {
+    right: -10px;
+}
+
+.receipt h3 {
+    margin-top: 10px;
+}
+
+.receipt button {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 25px;
+    background: #f84464;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* ================= REAL CINEMA TICKET ================= */
+
+.ticket {
+    display: flex;
+    max-width: 700px;
+    margin: 60px auto 20px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    font-family: Arial, sans-serif;
+}
+
+.ticket-left {
+    flex: 3;
+    padding: 25px;
+    background: #fff;
+    position: relative;
+}
+
+.ticket-right {
+    flex: 1;
+    background: #f84464;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.brand {
+    color: #f84464;
+    margin-bottom: 10px;
+}
+
+.ticket-info p {
+    margin: 8px 0;
+}
+
+.cut-line {
+    border-top: 2px dashed #ccc;
+    margin: 15px 0;
+}
+
+.status {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.download-btn {
+    display: block;
+    margin: 0 auto 50px;
+    padding: 12px 30px;
+    background: #f84464;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.download-btn:hover {
+    background: #d63350;
+}
+
+@media (max-width: 768px) {
+    .ticket {
+        flex-direction: column;
+    }
+}
+
+
+/* ===== NAVBAR LAYOUT ===== */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: black;
+}
+
+/* LEFT SIDE */
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo {
+    height: 40px;
+}
+
+.search-box input {
+    width: 350px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+}
+
+/* RIGHT SIDE */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.location {
+    padding: 6px 10px;
+    border-radius: 5px;
+}
+
+.login-btn {
+    background: #f84464;
+    color: white;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.menu-icon {
+    font-size: 22px;
+    color: white;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+
+    .search-box input {
+        width: 180px;
+    }
+
+    .navbar {
+        padding: 10px 15px;
+    }
+
+}
+
+/* ===== Responsive Fixes ===== */
+@media (max-width: 900px){
+  .navbar{
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px;
+  }
+  .nav-left{
+    width: 100%;
+    justify-content: space-between;
+  }
+  .search-box{
+    flex: 1;
+    max-width: 520px;
+  }
+  .nav-right{
+    width: 100%;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 600px){
+  .search-box{
+    max-width: 100%;
+  }
+  .location{
+    display: none; /* hide location on very small screens */
+  }
+  .login-btn{
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  .menu-icon{
+    width: 40px;
+    height: 40px;
+  }
+
+  /* movie cards grid (if you use .card for movies) */
+  .card{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .movie img{
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-width: 400px){
+  .card{
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== MOBILE NAV FIX ===== */
+@media (max-width: 768px){
+
+  .navbar{
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .nav-left{
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-box{
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .nav-right{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+
+  .login-btn{
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  /* Hide greeting text on small screens */
+  .hello{
+    display: none;
+  }
+
+}
+
+/* ===== MOBILE CATEGORY NAV FIX ===== */
+@media (max-width: 768px){
+
+  .sec-nav{
+    overflow-x: auto;
+  }
+
+  .s-left, .s-right{
+    display: flex;
+    gap: 20px;
+    white-space: nowrap;
+  }
+
+  .sec-nav::-webkit-scrollbar{
+    display: none;
+  }
+
+}
+
+
+
+/* ===========================
+   RESPONSIVE FIX (FINAL)
+   Put this at END of CSS
+=========================== */
+
+/* Make images responsive everywhere */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Banner images: avoid fixed height */
+.banner-img,
+.main img {
+  width: 100%;
+  height: auto;
+  max-height: 560px;
+  object-fit: cover;
+}
+
+/* SEARCH RESULTS should match search width */
+.search-box {
+  position: relative;
+  width: 350px;
+  max-width: 100%;
+}
+.search-results {
+  width: 100%;
+}
+
+/* ---------- TABLET (<= 900px) ---------- */
+@media (max-width: 900px) {
+
+  .navbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .nav-left {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .logo {
+    height: 38px;
+  }
+
+  .search-box {
+    flex: 1;
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .search-box input {
+    width: 100%;
+  }
+
+  .nav-right {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* Recommended movies grid becomes 3 columns */
+  .movies-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .movie {
+    width: 100% !important;
+  }
+}
+
+/* ---------- MOBILE (<= 768px) ---------- */
+@media (max-width: 768px) {
+
+  /* NAVBAR STACK */
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 10px 12px;
+  }
+
+  .nav-left {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .search-box {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 10px 12px;
+  }
+
+  .nav-right {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* Hide greeting text on mobile */
+  .hello {
+    display: none !important;
+  }
+
+  /* SECOND NAV becomes scrollable */
+  .sec-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 10px 12px;
+  }
+
+  .sec-nav .s-left,
+  .sec-nav .s-right {
+    display: flex;
+    gap: 18px;
+    white-space: nowrap;
+  }
+
+  .sec-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Recommended movies grid becomes 2 columns */
+  .movies-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 12px;
+  }
+
+  .container h2 {
+    margin: 16px 12px;
+  }
+
+  .movie {
+    width: 100% !important;
+  }
+
+  /* Footer stacks nicely */
+  .footer-services {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .footer-main {
+    padding: 35px 16px;
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+
+/* ---------- SMALL MOBILE (<= 600px) ---------- */
+@media (max-width: 600px) {
+
+  /* Hide location to save space */
+  .location {
+    display: none;
+  }
+
+  .login-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  /* Sidebar width on small screens */
+  aside#sidebar.sidebar {
+    width: 300px;
+    max-width: 92vw;
+  }
+}
+
+/* ---------- EXTRA SMALL (<= 400px) ---------- */
+@media (max-width: 400px) {
+  .movies-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sec-nav a{
+  color:#fff;
+  text-decoration:none;
+  margin-right:20px;
+  font-weight:600;
+  transition:0.3s;
+}
+
+.sec-nav a:hover{
+  color:#f84464;
+}
+
+.s-right a{
+  margin-left:20px;
+}
