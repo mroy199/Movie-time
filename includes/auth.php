@@ -1,32 +1,45 @@
 <?php
+// SAFE SESSION START
 if (session_status() === PHP_SESSION_NONE) {
-  session_start();
+    session_start();
 }
 
-/* ================= LOGIN CHECK ================= */
+// ================= CHECK LOGIN =================
+if (!function_exists('is_logged_in')) {
+    function is_logged_in() {
+        return isset($_SESSION['user_id']);
+    }
+}
+
+// ================= REQUIRE LOGIN =================
 if (!function_exists('require_login')) {
-  function require_login(){
-    if(!isset($_SESSION['user'])){
-      header("Location: /movietime/auth/login.php");
-      exit;
+    function require_login() {
+        if (!is_logged_in()) {
+            header("Location: /movieTime/auth/login.php");
+            exit;
+        }
     }
-  }
 }
 
-/* ================= ADMIN CHECK ================= */
+// ================= REQUIRE ADMIN =================
 if (!function_exists('require_admin')) {
-  function require_admin(){
-    require_login();
-
-    if($_SESSION['user']['role'] !== 'admin'){
-      die("⛔ Access Denied (Admin Only)");
+    function require_admin() {
+        if (!is_logged_in() || $_SESSION['role'] !== 'admin') {
+            header("Location: /movieTime/auth/login.php");
+            exit;
+        }
     }
-  }
 }
 
-/* ================= GET USER ================= */
+// ================= CURRENT USER =================
 if (!function_exists('current_user')) {
-  function current_user(){
-    return $_SESSION['user'] ?? null;
-  }
+    function current_user() {
+        return [
+            "id" => $_SESSION['user_id'] ?? null,
+            "name" => $_SESSION['name'] ?? "",
+            "email" => $_SESSION['email'] ?? "",
+            "role" => $_SESSION['role'] ?? "",
+            "photo" => $_SESSION['profile_photo'] ?? ""
+        ];
+    }
 }

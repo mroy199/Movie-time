@@ -226,8 +226,7 @@ button:hover{
   <a href="bookings.php">🎟 Bookings</a>
   <a href="contact.php">📩 Contact</a>
   <a href="../auth/logout.php">🚪 Logout</a>
-  <a href="/movietime/show.php" target="_blank">🌐 Go to Site</a>
-
+<a href="../show.php" class="go-site-btn">Go to Site</a>
 </div>
 
 <div class="main">

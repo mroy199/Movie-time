@@ -9,13 +9,14 @@ $error = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $title = trim($_POST["title"] ?? "");
+    $movie_link = trim($_POST["movie_link"] ?? "");
 
     if ($title === "") {
         $error = "Title is required.";
     } else {
 
-        $stmt = $conn->prepare("INSERT INTO movies (title) VALUES (?)");
-        $stmt->bind_param("s", $title);
+        $stmt = $conn->prepare("INSERT INTO movies (title, movie_link) VALUES (?, ?)");
+        $stmt->bind_param("ss", $title, $movie_link);
 
         if ($stmt->execute()) {
             $success = "Movie added successfully!";
@@ -46,10 +47,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <?php endif; ?>
 
 <form method="POST">
+
 <label>Movie Title</label>
 <input type="text" name="title" required>
 
 <br><br>
+
+<label>Movie URL (Poster / Trailer / Link)</label>
+<input type="url" name="movie_link" placeholder="https://example.com/movie.jpg or youtube link">
+
+<br><br>
+
 <button class="btn">Add Movie</button>
 </form>
 

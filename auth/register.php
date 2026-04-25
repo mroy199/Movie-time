@@ -1,50 +1,165 @@
 <?php
 require_once __DIR__ . "/../config/db.php";
+require_once __DIR__ . "/../vendor/autoload.php";
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 session_start();
 
+$mailConfig = require __DIR__ . "/../config/mail.php";
+
 $error = "";
+$success = "";
 $name  = trim($_POST["name"] ?? "");
 $email = trim($_POST["email"] ?? "");
 $mobile = trim($_POST["mobile"] ?? "");
 
-function clean($s){ return htmlspecialchars($s ?? "", ENT_QUOTES, "UTF-8"); }
+function clean($s){
+    return htmlspecialchars($s ?? "", ENT_QUOTES, "UTF-8");
+}
+
+function sendVerificationEmail($toEmail, $toName, $token, $mailConfig){
+    $mail = new PHPMailer(true);
+
+    try {
+$baseUrl = "http://localhost:8888/" . basename(dirname(__DIR__));
+    $verifyLink = $baseUrl . "/auth/verify.php?token=" . urlencode($token);
+
+        $mail->isSMTP();
+        $mail->Host       = $mailConfig['host'] ?? 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $mailConfig['username'] ?? '';
+        $mail->Password   = str_replace(' ', '', $mailConfig['password'] ?? '');
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = (int)($mailConfig['port'] ?? 587);
+
+        $mail->setFrom(
+            $mailConfig['from_email'] ?? $mailConfig['username'],
+            $mailConfig['from_name'] ?? 'MovieTime'
+        );
+        $mail->addAddress($toEmail, $toName);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Verify your MovieTime account';
+
+        $safeName = htmlspecialchars($toName, ENT_QUOTES, "UTF-8");
+        $safeLink = htmlspecialchars($verifyLink, ENT_QUOTES, "UTF-8");
+
+        $mail->Body = '
+        <div style="max-width:600px;margin:0 auto;background:#121218;border:1px solid #242432;border-radius:16px;overflow:hidden;font-family:Arial,sans-serif;color:#ffffff;">
+            <div style="padding:20px;border-bottom:1px solid #242432;background:#0f0f14;">
+                <h2 style="margin:0;color:#f84464;">MovieTime Email Verification</h2>
+            </div>
+            <div style="padding:24px;color:#d8d8e4;">
+                <p style="font-size:15px;">Hi ' . $safeName . ',</p>
+                <p style="font-size:15px;line-height:1.6;">
+                    Thank you for creating your MovieTime account.
+                    Please verify your email address by clicking the button below.
+                </p>
+                <p style="margin:30px 0;">
+                    <a href="' . $safeLink . '" style="display:inline-block;padding:12px 22px;background:#f84464;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:bold;">
+                        Verify Email
+                    </a>
+                </p>
+                <p style="font-size:14px;line-height:1.6;">Or open this link manually:</p>
+                <p style="word-break:break-all;">
+                    <a href="' . $safeLink . '" style="color:#ff5c7a;">' . $safeLink . '</a>
+                </p>
+                <p style="font-size:14px;line-height:1.6;">This link will expire in 24 hours.</p>
+                <p style="font-size:14px;line-height:1.6;">If you did not create this account, please ignore this email.</p>
+            </div>
+        </div>';
+
+        $mail->AltBody = "Hi {$toName}, verify your MovieTime account here: {$verifyLink}";
+
+        $mail->send();
+        return ["ok" => true, "message" => ""];
+    } catch (Exception $e) {
+        return ["ok" => false, "message" => $mail->ErrorInfo ?: $e->getMessage()];
+    }
+}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $pass  = $_POST["password"] ?? "";
-  $cpass = $_POST["confirm_password"] ?? "";
+    $pass  = $_POST["password"] ?? "";
+    $cpass = $_POST["confirm_password"] ?? "";
 
-  if ($name === "" || strlen($name) < 3) {
-    $error = "Name must be at least 3 characters.";
-  } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $error = "Please enter a valid email address.";
-  } elseif (strlen($pass) < 6) {
-    $error = "Password must be at least 6 characters.";
-  } elseif (!preg_match('/[A-Z]/', $pass) || !preg_match('/[a-z]/', $pass) || !preg_match('/[0-9]/', $pass)) {
-    $error = "Password must include uppercase, lowercase, and a number.";
-  } elseif ($pass !== $cpass) {
-    $error = "Passwords do not match.";
-  } else {
-    $check = $conn->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
-    $check->bind_param("s", $email);
-    $check->execute();
-    $exists = $check->get_result()->fetch_assoc();
-
-    if ($exists) {
-      $error = "This email is already registered. Please login.";
+    if ($name === "" || strlen($name) < 3) {
+        $error = "Name must be at least 3 characters.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Please enter a valid email address.";
+    } elseif ($mobile !== "" && !preg_match('/^[0-9]{10}$/', $mobile)) {
+        $error = "Please enter a valid 10-digit mobile number.";
+    } elseif (strlen($pass) < 6) {
+        $error = "Password must be at least 6 characters.";
+    } elseif (!preg_match('/[A-Z]/', $pass) || !preg_match('/[a-z]/', $pass) || !preg_match('/[0-9]/', $pass)) {
+        $error = "Password must include uppercase, lowercase, and a number.";
+    } elseif ($pass !== $cpass) {
+        $error = "Passwords do not match.";
     } else {
-      $hash = password_hash($pass, PASSWORD_BCRYPT);
+        $check = $conn->prepare("
+            SELECT id, fullname, email, is_verified
+            FROM users
+            WHERE email = ?
+            LIMIT 1
+        ");
+        $check->bind_param("s", $email);
+        $check->execute();
+        $exists = $check->get_result()->fetch_assoc();
 
-      $stmt = $conn->prepare("INSERT INTO users (fullname, email, password, mobile, role) VALUES (?, ?, ?, ?, 'user')");
-      $stmt->bind_param("ssss", $name, $email, $hash, $mobile);
+        if ($exists) {
+            if ((int)$exists["is_verified"] === 1) {
+                $error = "This email is already registered. Please login.";
+            } else {
+                $token = bin2hex(random_bytes(32));
+                $expiry = date("Y-m-d H:i:s", strtotime("+24 hours"));
 
-      if ($stmt->execute()) {
-        header("Location: login.php?registered=1");
-        exit;
-      } else {
-        $error = "Registration failed. Please try again.";
-      }
+                $update = $conn->prepare("
+                    UPDATE users
+                    SET fullname = ?, mobile = ?, verification_token = ?, verification_expires = ?
+                    WHERE email = ?
+                ");
+                $update->bind_param("sssss", $name, $mobile, $token, $expiry, $email);
+
+                if ($update->execute()) {
+                    $mailResult = sendVerificationEmail($email, $name, $token, $mailConfig);
+
+                    if ($mailResult["ok"]) {
+                        $success = "This email was already registered but not verified. A new verification email has been sent.";
+                    } else {
+                        $error = "This email is already registered but not verified. Resend failed: " . $mailResult["message"];
+                    }
+                } else {
+                    $error = "Could not update unverified account. Please try again.";
+                }
+            }
+        } else {
+            $hash = password_hash($pass, PASSWORD_BCRYPT);
+            $token = bin2hex(random_bytes(32));
+            $expiry = date("Y-m-d H:i:s", strtotime("+24 hours"));
+
+            $stmt = $conn->prepare("
+                INSERT INTO users (fullname, email, password, mobile, role, is_verified, verification_token, verification_expires)
+                VALUES (?, ?, ?, ?, 'user', 0, ?, ?)
+            ");
+            $stmt->bind_param("ssssss", $name, $email, $hash, $mobile, $token, $expiry);
+
+            if ($stmt->execute()) {
+                $mailResult = sendVerificationEmail($email, $name, $token, $mailConfig);
+
+                if ($mailResult["ok"]) {
+                    $success = "Registration successful! Verification email sent.";
+                    $name = "";
+                    $email = "";
+                    $mobile = "";
+                } else {
+                    $error = "Account created, but verification email could not be sent. SMTP error: " . $mailResult["message"];
+                }
+            } else {
+                $error = "Registration failed. Please try again.";
+            }
+        }
     }
-  }
 }
 ?>
 <!doctype html>
@@ -65,6 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       --pink:#f84464;
       --pink2:#ff5c7a;
       --shadow: 0 18px 45px rgba(0,0,0,.55);
+      --ok:#28c76f;
     }
     *{box-sizing:border-box}
     body{
@@ -104,7 +220,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     .title h1{margin:0;font-size:18px;letter-spacing:.2px}
     .title p{margin:3px 0 0;color:var(--muted);font-size:13px}
-
     .body{padding:18px 20px 20px}
     .msg{
       padding:10px 12px;
@@ -112,9 +227,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       border:1px solid;
       font-size:13px;
       margin-bottom:12px;
+      white-space:pre-wrap;
+      word-break:break-word;
     }
-    .msg.err{background: rgba(248,68,100,.12);border-color: rgba(248,68,100,.35);color:#ffd0da}
-
+    .msg.err{
+      background: rgba(248,68,100,.12);
+      border-color: rgba(248,68,100,.35);
+      color:#ffd0da;
+    }
+    .msg.ok{
+      background: rgba(40,199,111,.12);
+      border-color: rgba(40,199,111,.35);
+      color:#bff3d2;
+    }
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .field{margin-bottom:12px}
     label{display:block;margin-bottom:6px;color:#d8d8e4;font-size:13px}
@@ -132,8 +257,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       border-color: rgba(248,68,100,.55);
       box-shadow: 0 0 0 4px rgba(248,68,100,.12);
     }
-
     .pw-wrap{position:relative}
+    .pw-wrap .input{padding-right:46px}
     .eye{
       position:absolute;
       right:10px;
@@ -149,7 +274,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     .eye:hover{background: rgba(255,255,255,.06); color:#fff}
     .eye svg{width:20px;height:20px}
-
     .hint{
       color:var(--muted);
       font-size:12px;
@@ -157,7 +281,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       margin-bottom:10px;
       line-height:1.3;
     }
-
     .btn{
       width:100%;
       border:none;
@@ -171,7 +294,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       box-shadow: 0 10px 30px rgba(248,68,100,.25);
     }
     .btn:hover{filter:brightness(1.04)}
-
     .row{
       margin-top:12px;
       display:flex;
@@ -185,11 +307,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     a{color:var(--pink2);text-decoration:none;font-weight:700}
     a:hover{text-decoration:underline}
     .small{font-size:12px;color:var(--muted);margin-top:10px;text-align:center}
-
-    .pw-wrap .input{
-      padding-right:46px;
-    }
-
     @media (max-width: 520px){
       .grid{grid-template-columns:1fr}
     }
@@ -209,6 +326,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <div class="body">
         <?php if($error): ?>
           <div class="msg err"><?= clean($error) ?></div>
+        <?php endif; ?>
+
+        <?php if($success): ?>
+          <div class="msg ok"><?= clean($success) ?></div>
         <?php endif; ?>
 
         <form method="POST" onsubmit="return validateRegister()">
@@ -234,8 +355,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="field">
               <label>Password</label>
               <div class="pw-wrap">
-                <input class="input" name="password" id="password" type="password" required minlength="6"
-                       placeholder="Create password">
+                <input class="input" name="password" id="password" type="password" required minlength="6" placeholder="Create password">
                 <button type="button" class="eye" onclick="togglePassword('password','eye1')" aria-label="Show password">
                   <span id="eye1">
                     <svg viewBox="0 0 24 24" fill="none">
@@ -252,8 +372,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="field">
               <label>Confirm Password</label>
               <div class="pw-wrap">
-                <input class="input" name="confirm_password" id="confirm_password" type="password" required minlength="6"
-                       placeholder="Repeat password">
+                <input class="input" name="confirm_password" id="confirm_password" type="password" required minlength="6" placeholder="Repeat password">
                 <button type="button" class="eye" onclick="togglePassword('confirm_password','eye2')" aria-label="Show password">
                   <span id="eye2">
                     <svg viewBox="0 0 24 24" fill="none">
@@ -276,7 +395,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
           <div class="row">
             <span>Already have account? <a href="login.php">Login</a></span>
-            <span><a href="../show.php">Back to Home</a></span>
+            <span><a href="../index.php">Back to Home</a></span>
           </div>
 
           <div class="small">By creating an account, you agree to our Terms & Privacy Policy.</div>
@@ -286,24 +405,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   </div>
 
 <script>
-  function togglePassword(inputId, iconSpanId){
+function togglePassword(inputId, iconSpanId){
     const input = document.getElementById(inputId);
     const iconSpan = document.getElementById(iconSpanId);
     const show = input.type === "password";
     input.type = show ? "text" : "password";
     iconSpan.innerHTML = show ? eyeOpenSvg() : eyeClosedSvg();
-  }
+}
 
-  function eyeOpenSvg(){
+function eyeOpenSvg(){
     return `
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7S2.5 12 2.5 12Z" stroke="currentColor" stroke-width="2"/>
         <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
       </svg>
     `;
-  }
+}
 
-  function eyeClosedSvg(){
+function eyeClosedSvg(){
     return `
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M3 3l18 18" stroke="currentColor" stroke-width="2"/>
@@ -312,38 +431,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <path d="M10.2 10.2A3 3 0 0012 15a3 3 0 002.8-1.8" stroke="currentColor" stroke-width="2"/>
       </svg>
     `;
-  }
+}
 
-  function validateRegister(){
+function validateRegister(){
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
     const pass = document.getElementById("password").value;
     const cpass = document.getElementById("confirm_password").value;
 
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     if(name.length < 3){
-      alert("Name must be at least 3 characters.");
-      return false;
+        alert("Name must be at least 3 characters.");
+        return false;
     }
     if(!emailOk){
-      alert("Please enter a valid email.");
-      return false;
+        alert("Please enter a valid email.");
+        return false;
+    }
+    if(mobile !== "" && !/^[0-9]{10}$/.test(mobile)){
+        alert("Please enter a valid 10-digit mobile number.");
+        return false;
     }
     if(pass.length < 6){
-      alert("Password must be at least 6 characters.");
-      return false;
+        alert("Password must be at least 6 characters.");
+        return false;
     }
     if(!/[A-Z]/.test(pass) || !/[a-z]/.test(pass) || !/[0-9]/.test(pass)){
-      alert("Password must include uppercase, lowercase, and a number.");
-      return false;
+        alert("Password must include uppercase, lowercase, and a number.");
+        return false;
     }
     if(pass !== cpass){
-      alert("Passwords do not match.");
-      return false;
+        alert("Passwords do not match.");
+        return false;
     }
     return true;
-  }
+}
 </script>
 </body>
 </html>

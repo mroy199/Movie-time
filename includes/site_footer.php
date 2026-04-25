@@ -1,4 +1,5 @@
 <div class="footer">
+
   <div class="footer-services">
     <div class="service">
       <i class="fa-solid fa-headset"></i>
@@ -20,40 +21,47 @@
   </div>
 
   <div class="footer-main">
+
+    <!-- LOGO + ABOUT -->
     <div class="footer-col">
-      <img src="./assets/image.png" class="footer-logo" alt="logo">
+      <img src="/movietime/assets/image.png" class="footer-logo" alt="logo">
       <p class="footer-about">
         MovieTime is India's emerging online ticketing platform for
         movies, sports, events and entertainment experiences.
       </p>
     </div>
 
+    <!-- EXPLORE -->
     <div class="footer-col">
       <h4>Explore</h4>
-      <a href="movies.php">Movies</a>
-      <a href="events.php">Events</a>
-      <a href="sports.php">Sports</a>
-      <a href="offers.php">Offers</a>
+      <a href="/movietime/movies.php">Movies</a>
+      <a href="/movietime/events.php">Events</a>
+      <a href="/movietime/sports.php">Sports</a>
+      <a href="/movietime/offers.php">Offers</a>
     </div>
 
+    <!-- COMPANY -->
     <div class="footer-col">
       <h4>Company</h4>
-      <a href="listyourshow.php">List Your Show</a>
-      <a href="stream.php">Stream</a>
-      <a href="show.php">Home</a>
+      <a href="/movietime/listyourshow.php">List Your Show</a>
+      <a href="/movietime/stream.php">Stream</a>
+      <a href="/movietime/show.php">Home</a>
+      <a href="/movietime/contact.php">Contact</a> <!-- ✅ FIXED -->
     </div>
+
   </div>
 
   <div class="footer-bottom">
     <div class="footer-social">
-      <i class="fa-brands fa-facebook"></i>
-      <i class="fa-brands fa-instagram"></i>
-      <i class="fa-brands fa-x-twitter"></i>
-      <i class="fa-brands fa-youtube"></i>
-      <i class="fa-brands fa-linkedin"></i>
+      <a href="#"><i class="fa-brands fa-facebook"></i></a>
+      <a href="#"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="#"><i class="fa-brands fa-youtube"></i></a>
+      <a href="#"><i class="fa-brands fa-linkedin"></i></a>
     </div>
     <p>© 2026 MovieTime Entertainment Pvt. Ltd. All Rights Reserved.</p>
   </div>
+
 </div>
 
 </body>

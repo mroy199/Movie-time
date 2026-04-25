@@ -1,7 +1,12 @@
 <?php
 session_start();
 include("config/db.php");
-require_once __DIR__ . "/includes/send_mail.php";
+require_once("config/razorpay.php");
+require_once __DIR__ . "/vendor/autoload.php";
+
+require_once("config/razorpay.php");
+
+use Razorpay\Api\Api;
 
 if (!isset($_SESSION["user_id"])) {
     header("Location: auth/login.php");
@@ -18,10 +23,10 @@ $pending = $_SESSION["pending_booking"];
 
 $movie_id = (int)($pending["movie_id"] ?? 0);
 $selectedSeats = $pending["selected_seats"] ?? [];
-$show_date = $pending["show_date"] ?? "";
-$show_time = $pending["show_time"] ?? "";
+$show_date = trim($pending["show_date"] ?? "");
+$show_time = trim($pending["show_time"] ?? "");
 
-if ($movie_id <= 0 || empty($selectedSeats)) {
+if ($movie_id <= 0 || empty($selectedSeats) || $show_date === "" || $show_time === "") {
     unset($_SESSION["pending_booking"]);
     die("Invalid booking session.");
 }
@@ -36,143 +41,68 @@ if (!$movie) {
     die("Movie not found.");
 }
 
-$movieTitle = $movie["title"] ?? "Untitled Movie";
-$movieImage = !empty($movie["image"]) ? $movie["image"] : "./assets/image.png";
-
-$ticketPrice = 200;
-$totalAmount = count($selectedSeats) * $ticketPrice;
-$error = "";
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $payment_method = trim($_POST["payment_method"] ?? "");
-
-    if ($payment_method === "") {
-        $error = "Please select a payment method.";
-    } else {
-        foreach ($selectedSeats as $seat) {
-            $seat = trim($seat);
-
-            $check = $conn->prepare("
-                SELECT id 
-                FROM bookings 
-                WHERE movie_id = ? AND seat_number = ? AND show_date = ? AND show_time = ?
-            ");
-            $check->bind_param("isss", $movie_id, $seat, $show_date, $show_time);
-            $check->execute();
-            $checkResult = $check->get_result();
-
-            if ($checkResult->num_rows > 0) {
-                $error = "Seat $seat is already booked.";
-                break;
-            }
-        }
-
-        if ($error === "") {
-            $bookingIds = [];
-
-            foreach ($selectedSeats as $seat) {
-                $seat = trim($seat);
-
-                // store price per seat
-                $insert = $conn->prepare("
-                    INSERT INTO bookings 
-                    (user_id, movie_id, seat_number, show_date, show_time, total_amount, payment_status, payment_method) 
-                    VALUES (?, ?, ?, ?, ?, ?, 'Paid', ?)
-                ");
-                $insert->bind_param(
-                    "iisssds",
-                    $user_id,
-                    $movie_id,
-                    $seat,
-                    $show_date,
-                    $show_time,
-                    $ticketPrice,
-                    $payment_method
-                );
-                $insert->execute();
-
-                $bookingIds[] = $conn->insert_id;
-            }
-
-          // ================= EMAIL CODE START =================
-
-$userStmt = $conn->prepare("SELECT fullname, email FROM users WHERE id = ?");
+$userStmt = $conn->prepare("SELECT fullname, email, mobile FROM users WHERE id = ?");
 $userStmt->bind_param("i", $user_id);
 $userStmt->execute();
 $user = $userStmt->get_result()->fetch_assoc();
 
-if (!empty($bookingIds) && !empty($user["email"])) {
+$movieTitle = $movie["title"] ?? "Untitled Movie";
+$movieImage = !empty($movie["image"]) ? $movie["image"] : "./assets/image.png";
 
-    $placeholders = implode(",", array_fill(0, count($bookingIds), "?"));
-    $types = str_repeat("i", count($bookingIds));
+$ticketPrice = isset($movie["price"]) && (float)$movie["price"] > 0 ? (float)$movie["price"] : 200;
+$totalAmount = count($selectedSeats) * $ticketPrice;
+$totalAmountPaise = (int) round($totalAmount * 100);
 
-    $sql = "
-        SELECT bookings.*, movies.title
-        FROM bookings
-        JOIN movies ON bookings.movie_id = movies.id
-        WHERE bookings.id IN ($placeholders)
-    ";
+$error = "";
+$razorpayOrderId = "";
 
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param($types, ...$bookingIds);
-    $stmt->execute();
-    $result = $stmt->get_result();
+foreach ($selectedSeats as $seat) {
+    $seat = trim($seat);
 
-    $rows = [];
-    while ($r = $result->fetch_assoc()) {
-        $rows[] = $r;
-    }
+    $check = $conn->prepare("
+        SELECT id 
+        FROM bookings 
+        WHERE movie_id = ? AND seat_number = ? AND show_date = ? AND show_time = ?
+    ");
+    $check->bind_param("isss", $movie_id, $seat, $show_date, $show_time);
+    $check->execute();
+    $checkResult = $check->get_result();
 
-    if ($rows) {
-        $movieTitle = $rows[0]["title"];
-        $seatNumbers = [];
-        $totalAmount = 0;
-
-        foreach ($rows as $r) {
-            $seatNumbers[] = $r["seat_number"];
-            $totalAmount += $r["total_amount"];
-        }
-
-        $subject = "MovieTime Booking Confirmed 🎟️";
-
-        $htmlBody = "
-        <div style='font-family:Arial;background:#111;color:#fff;padding:20px;border-radius:12px'>
-            <h2 style='color:#f84464'>Booking Confirmed</h2>
-            <p>Hello {$user["fullname"]},</p>
-            <p>Your booking is successful!</p>
-
-            <div style='background:#1a1a1a;padding:15px;border-radius:10px;margin-top:10px'>
-                <p><b>Movie:</b> {$movieTitle}</p>
-                <p><b>Seats:</b> " . implode(", ", $seatNumbers) . "</p>
-                <p><b>Date:</b> {$show_date}</p>
-                <p><b>Time:</b> {$show_time}</p>
-                <p><b>Total Paid:</b> ₹" . number_format($totalAmount, 2) . "</p>
-                <p><b>Status:</b> Paid</p>
-            </div>
-
-            <p style='margin-top:15px'>Enjoy your movie 🎬</p>
-        </div>
-        ";
-
-        sendMovieTimeMail(
-            $user["email"],
-            $user["fullname"],
-            $subject,
-            $htmlBody
-        );
+    if ($checkResult->num_rows > 0) {
+        $error = "Seat $seat is already booked.";
+        break;
     }
 }
 
-// ================= EMAIL CODE END =================
+if ($error === "") {
+    try {
+        $api = new Api(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET);
 
-// redirect
-$_SESSION["last_booking_ids"] = $bookingIds;
-unset($_SESSION["pending_booking"]);
+        $orderData = [
+            'receipt'         => 'movietime_' . time() . '_' . $user_id,
+            'amount'          => $totalAmountPaise,
+            'currency'        => 'INR',
+            'payment_capture' => 1
+        ];
 
-header("Location: receipt.php");
-exit;
-        }
+        $razorpayOrder = $api->order->create($orderData);
+        $razorpayOrderId = $razorpayOrder['id'];
+
+        $_SESSION["razorpay_checkout"] = [
+            "order_id" => $razorpayOrderId,
+            "amount" => $totalAmount,
+            "movie_id" => $movie_id,
+            "selected_seats" => $selectedSeats,
+            "show_date" => $show_date,
+            "show_time" => $show_time
+        ];
+    } catch (Exception $e) {
+        $error = "Unable to create payment order. " . $e->getMessage();
     }
+}
+
+function clean($value) {
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 ?>
 <!DOCTYPE html>
@@ -211,15 +141,6 @@ exit;
       border-radius:14px;
       padding:20px;
     }
-    .pay-box select{
-      width:100%;
-      padding:12px;
-      border:none;
-      border-radius:8px;
-      background:#222;
-      color:#fff;
-      margin-top:10px;
-    }
     .btn{
       margin-top:20px;
       background:#f84464;
@@ -232,6 +153,7 @@ exit;
       text-decoration:none;
       display:inline-block;
     }
+    .btn.secondary{background:#222}
     .err{
       background:#331218;
       color:#ff9ab0;
@@ -250,39 +172,76 @@ exit;
   <div class="wrap">
     <div class="box">
       <div class="poster">
-        <img src="<?= htmlspecialchars($movieImage) ?>" alt="<?= htmlspecialchars($movieTitle) ?>">
+        <img src="<?= clean($movieImage) ?>" alt="<?= clean($movieTitle) ?>">
       </div>
 
       <div class="details">
-        <h1><?= htmlspecialchars($movieTitle) ?></h1>
-        <p>Seats: <?= htmlspecialchars(implode(", ", $selectedSeats)) ?></p>
-        <p>Date: <?= htmlspecialchars($show_date ?: "N/A") ?></p>
-        <p>Time: <?= htmlspecialchars($show_time ?: "N/A") ?></p>
+        <h1><?= clean($movieTitle) ?></h1>
+        <p>Seats: <?= clean(implode(", ", $selectedSeats)) ?></p>
+        <p>Date: <?= clean($show_date) ?></p>
+        <p>Time: <?= clean($show_time) ?></p>
         <p>Ticket Price (per seat): ₹<?= number_format($ticketPrice, 2) ?></p>
         <p><strong>Total Amount: ₹<?= number_format($totalAmount, 2) ?></strong></p>
         <p class="muted">Selected seats: <?= count($selectedSeats) ?></p>
 
         <div class="pay-box">
           <?php if ($error): ?>
-            <div class="err"><?= htmlspecialchars($error) ?></div>
+            <div class="err"><?= clean($error) ?></div>
+          <?php else: ?>
+            <p>Click below to pay securely with Razorpay.</p>
+
+            <button type="button" class="btn" id="rzp-button">Pay Now</button>
+            <a href="show.php" class="btn secondary">Cancel</a>
+
+            <form id="razorpay-success-form" action="razorpay_verify.php" method="POST" style="display:none;">
+              <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+              <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+              <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+            </form>
           <?php endif; ?>
-
-          <form method="POST">
-            <label>Select Payment Method</label>
-            <select name="payment_method" required>
-              <option value="">Choose one</option>
-              <option value="UPI">UPI</option>
-              <option value="Card">Credit/Debit Card</option>
-              <option value="Net Banking">Net Banking</option>
-              <option value="Cash">Cash</option>
-            </select>
-
-            <button type="submit" class="btn">Pay Now</button>
-            <a href="show.php" class="btn" style="background:#222;">Cancel</a>
-          </form>
         </div>
       </div>
     </div>
   </div>
+
+  <?php if (!$error && $razorpayOrderId !== ""): ?>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      const options = {
+        key: "<?= clean(RAZORPAY_KEY_ID) ?>",
+        amount: "<?= (int)$totalAmountPaise ?>",
+        currency: "INR",
+        name: "MovieTime",
+        description: "Movie Ticket Booking",
+        image: "./assets/image.png",
+        order_id: "<?= clean($razorpayOrderId) ?>",
+        handler: function (response) {
+          document.getElementById("razorpay_payment_id").value = response.razorpay_payment_id;
+          document.getElementById("razorpay_order_id").value = response.razorpay_order_id;
+          document.getElementById("razorpay_signature").value = response.razorpay_signature;
+          document.getElementById("razorpay-success-form").submit();
+        },
+        prefill: {
+          name: "<?= clean($user["fullname"] ?? "") ?>",
+          email: "<?= clean($user["email"] ?? "") ?>",
+          contact: "<?= clean($user["mobile"] ?? "") ?>"
+        },
+        theme: {
+          color: "#f84464"
+        }
+      };
+
+      const rzp = new Razorpay(options);
+
+      rzp.on('payment.failed', function (response) {
+        alert("Payment failed: " + response.error.description);
+      });
+
+      document.getElementById("rzp-button").onclick = function (e) {
+        rzp.open();
+        e.preventDefault();
+      };
+    </script>
+  <?php endif; ?>
 </body>
 </html>

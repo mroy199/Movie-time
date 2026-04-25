@@ -19,14 +19,22 @@ if(isset($_POST['add_user'])){
 }
 
 // ================= DELETE =================
-if(isset($_GET['delete'])){
-  $id = (int)$_GET['delete'];
-  $stmt = $conn->prepare("DELETE FROM users WHERE id=?");
-  $stmt->bind_param("i",$id);
-  $stmt->execute();
+if (isset($_GET['delete'])) {
+    $id = (int)$_GET['delete'];
 
-  header("Location: users.php");
-  exit;
+    // Main admin protection
+    if ($id === 1) {
+        header("Location: users.php?error=protected");
+        exit;
+    }
+
+    $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+
+    header("Location: users.php?success=deleted");
+    exit;
 }
 
 // ================= FETCH =================

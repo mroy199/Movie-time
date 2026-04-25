@@ -72,10 +72,9 @@ if(isset($_POST['add_movie'])){
 <div class="card">
 <h3>Add Movie</h3>
 
-<form method="POST" enctype="multipart/form-data">
-<input type="text" name="title" placeholder="Title" required>
-<input type="file" name="image" required>
-<input type="text" name="genre" placeholder="Genre" required>
+<form method="POST">
+  <input type="text" name="title" placeholder="Title" required>
+<input type="url" name="image" placeholder="Poster Image URL / Movie Link" required><input type="text" name="genre" placeholder="Genre" required>
 <input type="text" name="rating" placeholder="Rating">
 <input type="text" name="duration" placeholder="Duration">
 <input type="text" name="language" placeholder="Language">
